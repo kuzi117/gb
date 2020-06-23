@@ -1,0 +1,4 @@
+set(SIM_SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/Simulator.cpp"
+  PARENT_SCOPE
+)
