@@ -4,21 +4,43 @@
 #include <cstdint>
 #include <memory>
 
+//! Namespace holding memory defaults.
 namespace memdefaults {
-//! The default values for the first part of the reset-able I/O registers.
-constexpr uint8_t ioRegs1[20] = {0x00, 0x00, 0x00, 0x80, 0xBF, 0xF3, 0xBF,
-                                 0x3F, 0x00, 0xBF, 0x7F, 0xFF, 0x9F, 0xBF,
-                                 0xFF, 0x00, 0x00, 0xBF, 0x77, 0xF3};
+
+struct MemValue {
+  //! No default constructor.
+  MemValue() = delete;
+
+  //! Construct with value and location.
+  constexpr MemValue(uint16_t location, uint8_t value) : location(location), value(value) { }
+
+  //! The memory location for this value.
+  const uint16_t location;
+
+  //! The memory value.
+  const uint8_t value;
+};
+
+//! The default values for the reset-able I/O registers.
+constexpr MemValue ioRegs[29] = {
+    {0xFF05, 0x00}, {0xFF06, 0x00}, {0xFF07, 0x00}, {0xFF10, 0x80},
+    {0xFF11, 0xBF}, {0xFF12, 0xF3}, {0xFF14, 0xBF}, {0xFF16, 0x3F},
+    {0xFF17, 0x00}, {0xFF19, 0xBF}, {0xFF1A, 0x7F}, {0xFF1B, 0xFF},
+    {0xFF1C, 0x9F}, {0xFF1E, 0xBF}, {0xFF20, 0xFF}, {0xFF21, 0x00},
+    {0xFF22, 0x00}, {0xFF23, 0xBF}, {0xFF24, 0x77}, {0xFF25, 0xF3},
+    {0xFF40, 0x91}, {0xFF42, 0x00}, {0xFF43, 0x00}, {0xFF45, 0x00},
+    {0xFF47, 0xFC}, {0xFF48, 0xFF}, {0xFF49, 0xFF}, {0xFF4A, 0x00},
+    {0xFF4B, 0x00}};
 
 //! The NR52 Gameboy value.
-constexpr uint8_t nr52GB = 0xF1;
+constexpr MemValue nr52GB(0xFF26, 0xF1);
 
 //! The NR52 Super Gameboy value.
-constexpr uint8_t nr52SGB = 0xF0;
+constexpr MemValue nr52SGB(0xFF26, 0xF0);
 
-//! The default values for the second part of the reset-able I/O registers.
-constexpr uint8_t ioRegs2[9] = {0x91, 0x00, 0x00, 0x00, 0xFC,
-                                0xFF, 0xFF, 0x00, 0x00};
+//! The default value for the Interrupts Enable register.
+constexpr MemValue ie(0xFFFF, 0x00);
+
 } // End namespace memdefaults.
 
 /**
