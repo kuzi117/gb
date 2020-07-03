@@ -41,6 +41,36 @@ void Simulator::reset() {
 }
 
 void Simulator::load(const char *romLoc) {
+  DLOG_S(INFO) << "Opening ROM at " << romLoc;
+  std::ifstream rom(romLoc, std::ifstream::in | std::ifstream::binary);
+
+  if (!rom.is_open())
+    ABORT_F("ROM failed to open.");
+
+  mem = std::make_unique<MBC0>(rom);
+
+#ifndef DNDEBUG
+  rom.seekg(0, std::ifstream::end);
+  std::streampos trueSize = rom.tellg();
+  rom.seekg(0, std::ifstream::beg);
+  DLOG_S(1) << "ROM true size: " << trueSize;
+#endif
+
+  rom.seekg(0x148, std::ifstream::beg);
+
+  uint8_t byte;
+  rom >> byte;
+  DLOG_IF_F(1, rom.bad(), "ROM read failure!");
+
+  uint32_t size = 1u << (15u + byte);
+  DLOG_F(1, "ROM calculated size: %u", size);
+
+#ifndef DNDEBUG
+  DLOG_IF_F(WARNING, trueSize != size,
+            "True and calculated ROM size mismatch! True: %u, calculated: %u",
+            static_cast<unsigned>(trueSize), size);
+#endif
+
 }
 
 void Simulator::run() {
