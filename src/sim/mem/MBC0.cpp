@@ -7,6 +7,8 @@
 #include <iterator>
 #include <memory>
 
+using namespace memutil;
+
 MBC0::MBC0(std::ifstream &rom) : MemoryController() {
   LOG_F(INFO, "Initialising MBC0.");
 
@@ -35,11 +37,11 @@ uint8_t MBC0::read8(uint16_t address) const {
   DLOG_F(2, "Read8: mem[0x%04X]", address);
   // ROM0.
   if (address < 0x4000u) {
-    LOG_F(WARNING, "Read from ROM0 unimplemented.");
+    return (*ROM0)[address];
   }
   // ROM1.
   else if (address < 0x8000u) {
-    LOG_F(WARNING, "Read from ROM1 unimplemented.");
+    return (*ROM1)[address - 0x4000u];
   }
   // VRAM.
   else if (address < 0xA000u) {
@@ -88,11 +90,11 @@ uint16_t MBC0::read16(uint16_t address) const {
   DLOG_F(2, "Read16 mem[0x%04X]", address);
   // ROM0.
   if (address < 0x4000u) {
-    LOG_F(WARNING, "Read from ROM0 unimplemented.");
+    return leRead16(*ROM0, address);
   }
   // ROM1.
   else if (address < 0x8000u) {
-    LOG_F(WARNING, "Read from ROM1 unimplemented.");
+    return leRead16(*ROM1, address - 0x4000u);
   }
   // VRAM.
   else if (address < 0xA000u) {
@@ -195,11 +197,11 @@ void MBC0::write(uint16_t address, uint16_t data) {
   DLOG_F(2, "Write16: mem[0x%04X] <- 0x%02X", address, data);
   // ROM0.
   if (address < 0x4000u) {
-    LOG_F(WARNING, "Write to ROM0: ignored.");
+    LOG_F(WARNING, "Write16 to ROM0: ignored.");
   }
   // ROM1.
   else if (address < 0x8000u) {
-    LOG_F(WARNING, "Write to ROM1: ignored.");
+    LOG_F(WARNING, "Write16 to ROM1: ignored.");
   }
   // VRAM.
   else if (address < 0xA000u) {
