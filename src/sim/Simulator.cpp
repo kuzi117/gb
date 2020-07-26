@@ -49,7 +49,7 @@ void Simulator::load(const char *romLoc) {
 
   mem = std::make_unique<MBC0>(rom);
 
-#ifndef DNDEBUG
+#ifndef NDEBUG
   rom.seekg(0, std::ifstream::end);
   std::streampos trueSize = rom.tellg();
   rom.seekg(0, std::ifstream::beg);
@@ -65,7 +65,7 @@ void Simulator::load(const char *romLoc) {
   uint32_t size = 1u << (15u + byte);
   DLOG_F(1, "ROM calculated size: %u", size);
 
-#ifndef DNDEBUG
+#ifndef NDEBUG
   DLOG_IF_F(WARNING, trueSize != size,
             "True and calculated ROM size mismatch! True: %u, calculated: %u",
             static_cast<unsigned>(trueSize), size);
