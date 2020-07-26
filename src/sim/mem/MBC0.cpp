@@ -31,6 +31,12 @@ MBC0::MBC0(std::ifstream &rom) : MemoryController() {
   DLOG_S(1) << "Copying to ROM1: " << rom.tellg() << ", " << std::boolalpha << rom.good();
   rom.read(reinterpret_cast<char *>(ROM1->begin()), kilo16);
   DLOG_F(1, "Copied to ROM1: %lu", static_cast<uint64_t>(rom.tellg()));
+
+  // Allocate I/O register space.
+  DLOG_F(1, "Allocating I/O registers.");
+  IO = std::make_unique<arrayIO>();
+  arrayIO a();
+  DLOG_F(1, "I/O registers allocated.");
 }
 
 uint8_t MBC0::read8(uint16_t address) const {
