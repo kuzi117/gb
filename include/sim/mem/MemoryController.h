@@ -1,6 +1,8 @@
 #ifndef GB_MEMORYCONTROLLER_H
 #define GB_MEMORYCONTROLLER_H
 
+#include "loguru.hpp"
+
 #include <cstdint>
 #include <memory>
 
@@ -42,6 +44,29 @@ constexpr MemValue nr52SGB(0xFF26, 0xF0);
 constexpr MemValue ie(0xFFFF, 0x00);
 
 } // End namespace memdefaults.
+
+//! Namespace holding memory utilities.
+namespace memutil {
+
+//! Performs a 16-bit, little-endian read.
+template<std::size_t size>
+inline uint16_t leRead16(const std::array<uint8_t, size> &mem, uint16_t address) {
+  LOG_IF_F(WARNING, address >= mem.size(), "Read out of bounds: %u > %ul", address, mem.size());
+  uint16_t word = mem[address + 1];
+  word <<= 8u;
+  word |= mem[address];
+  return word;
+}
+
+//! Performs a 16-bit, little-endian write.
+template<std::size_t size>
+inline void leWrite16(std::array<uint8_t, size> &mem, uint16_t address, uint16_t value) {
+  LOG_IF_F(WARNING, address >= mem.size(), "Write out of bounds: %u > %ul", address, mem.size());
+  mem[address] = static_cast<uint8_t>(value & 0xFFu);
+  mem[address + 1] = static_cast<uint8_t>((value & 0xFF00u) >> 8u);
+}
+
+} // End namespace memutil.
 
 /**
  * \brief Base class for all memory controllers.
