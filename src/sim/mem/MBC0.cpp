@@ -18,10 +18,10 @@ MBC0::MBC0(std::ifstream &rom) : MemoryController() {
   // Allocate ROM space.
   DLOG_F(1, "Allocating ROM0.");
   ROM0 = std::make_unique<array16k>();
-  DLOG_F(1, "ROM0 Allocated.");
+  DLOG_F(1, "ROM0 allocated.");
   DLOG_F(1, "Allocating ROM1.");
   ROM1 = std::make_unique<array16k>();
-  DLOG_F(1, "ROM1 Allocated.");
+  DLOG_F(1, "ROM1 allocated.");
 
   // Copy ROM data.
   DLOG_S(1) << "Copying to ROM0: " << rom.tellg() << ", " << std::boolalpha << rom.good();
