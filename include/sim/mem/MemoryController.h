@@ -1,7 +1,9 @@
 #ifndef GB_MEMORYCONTROLLER_H
 #define GB_MEMORYCONTROLLER_H
 
+#ifndef NDEBUG
 #include "loguru.hpp"
+#endif
 
 #include <cstdint>
 #include <memory>
@@ -48,23 +50,51 @@ constexpr MemValue ie(0xFFFF, 0x00);
 //! Namespace holding memory utilities.
 namespace memutil {
 
-//! Performs a 16-bit, little-endian read.
+#ifdef NDEBUG
+#define ACCESS(MEM, ADDR) MEM.at(ADDR)
+#else
+#define MEMACCESS(MEM, ADDR) mem[ADDR]
+#endif
+
+/**
+ * \brief Performs a 16-bit, little-endian read.
+ *
+ * Without NDEBUG defined, out of bounds accesses are logged but not stopped. However, if NDEBUG is
+ * defined, out of bounds accesses cause an exception.
+ *
+ * \tparam size Size of the memory, usually inferred from \p mem.
+ * \param mem The memory to access.
+ * \param address The address to read from in the memory.
+ * \return The read 16-bit value.
+ */
 template<std::size_t size>
 inline uint16_t leRead16(const std::array<uint8_t, size> &mem, uint16_t address) {
-  LOG_IF_F(WARNING, address >= mem.size(), "Read out of bounds: %u > %ul", address, mem.size());
-  uint16_t word = mem[address + 1];
+  DLOG_IF_F(WARNING, address >= mem.size(), "Read out of bounds: %u > %ul", address, mem.size());
+  uint16_t word = MEMACCESS(mem, address + 1);
   word <<= 8u;
-  word |= mem[address];
+  word |= MEMACCESS(MEM, address);
   return word;
 }
 
-//! Performs a 16-bit, little-endian write.
+/**
+ * \brief Performs a 16-bit, little-endian write.
+ *
+ * Without NDEBUG defined, out of bounds accesses are logged but not stopped. However, if NDEBUG is
+ * defined, out of bounds accesses cause an exception.
+ *
+ * \tparam size Size of the memory, usually inferred from \p mem.
+ * \param mem The memory to access.
+ * \param address The address to read from in the memory.
+ * \param value The value to write.
+ */
 template<std::size_t size>
 inline void leWrite16(std::array<uint8_t, size> &mem, uint16_t address, uint16_t value) {
-  LOG_IF_F(WARNING, address >= mem.size(), "Write out of bounds: %u > %ul", address, mem.size());
-  mem[address] = static_cast<uint8_t>(value & 0xFFu);
-  mem[address + 1] = static_cast<uint8_t>((value & 0xFF00u) >> 8u);
+  DLOG_IF_F(WARNING, address >= mem.size(), "Write out of bounds: %u > %ul", address, mem.size());
+  MEMACCESS(mem, address) = static_cast<uint8_t>(value & 0xFFu);
+  MEMACCESS(mem, address + 1) = static_cast<uint8_t>((value & 0xFF00u) >> 8u);
 }
+
+#undef MEMACCESS
 
 } // End namespace memutil.
 
